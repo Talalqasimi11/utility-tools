@@ -50,7 +50,7 @@ export async function mergePdfs(files: File[]): Promise<ProcessingResult<Blob>> 
         fileCount: files.length,
       }
     };
-  } catch (_error) {
+  } catch {
     return {
       success: false,
       error: {
