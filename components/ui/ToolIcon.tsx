@@ -97,6 +97,7 @@ export default function ToolIcon({
         viewBox="0 0 24 24"
         strokeWidth={1.5}
         stroke="currentColor"
+        aria-hidden="true"
       >
         <IconPaths slug={slug} />
       </svg>

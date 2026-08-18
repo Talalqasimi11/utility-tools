@@ -31,7 +31,7 @@ export default function PdfToJpgTool() {
   const handleFilesSelected = async (newFiles: File[]) => {
     const selectedFile = newFiles[0];
 
-    const validationErr = validateFiles([selectedFile], {
+    const validationErr = await validateFiles([selectedFile], {
       maxSizeMB: 50,
       maxFiles: 1,
     });
@@ -52,7 +52,7 @@ export default function PdfToJpgTool() {
     setStatus("processing"); // Show spinner while extracting page count
 
     try {
-      // @ts-expect-error
+      // @ts-expect-error - pdfjs-dist build files lack .d.ts declarations
       const pdfjsLib = await import('pdfjs-dist/build/pdf.mjs');
       pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
       

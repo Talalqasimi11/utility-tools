@@ -15,7 +15,7 @@ export default function ErrorMessage({ error, onRetry }: ErrorMessageProps) {
   const message = typeof error === "string" ? error : error.message;
 
   return (
-    <div className="rounded-lg border border-error/20 bg-error-light p-6 text-center">
+    <div className="rounded-lg border border-error/20 bg-error-light p-6 text-center" role="alert">
       {/* Error icon */}
       <div className="flex justify-center mb-3">
         <svg
@@ -24,6 +24,7 @@ export default function ErrorMessage({ error, onRetry }: ErrorMessageProps) {
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
+          aria-hidden="true"
         >
           <path
             strokeLinecap="round"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, useEffect } from "react";
 
 interface FileDropzoneProps {
   /** MIME types to accept (e.g. ["application/pdf"]) */
@@ -36,7 +36,17 @@ export default function FileDropzone({
   description,
 }: FileDropzoneProps) {
   const [isDragging, setIsDragging] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsTouchDevice(
+      "ontouchstart" in window ||
+      navigator.maxTouchPoints > 0 ||
+      window.matchMedia("(pointer: coarse)").matches
+    );
+  }, []);
 
   const acceptString = accept
     .map((mime) => MIME_TO_EXTENSIONS[mime] || mime)
@@ -122,6 +132,7 @@ export default function FileDropzone({
       role="button"
       tabIndex={disabled ? -1 : 0}
       aria-label={label || "Upload files"}
+      aria-describedby="dropzone-description"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -154,9 +165,11 @@ export default function FileDropzone({
 
       <div className="text-center">
         <p className="text-sm font-medium text-foreground">
-          {label || "Drag & drop files here, or click to browse"}
+          {isTouchDevice 
+            ? "Tap here to select files" 
+            : (label || "Drag & drop files here, or click to browse")}
         </p>
-        <p className="text-xs text-muted mt-1">
+        <p id="dropzone-description" className="text-xs text-muted mt-1">
           {description || `${extensionsList} files, up to ${maxSizeMB} MB`}
         </p>
       </div>

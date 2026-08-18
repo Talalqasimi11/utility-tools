@@ -11,6 +11,7 @@ export function generateMetadata(): Metadata {
   return {
     title: tool.seoTitle,
     description: tool.seoDescription,
+    alternates: { canonical: tool.url },
   };
 }
 
@@ -47,3 +48,4 @@ export default function SplitPdfPage() {
     </ToolLayout>
   );
 }
+

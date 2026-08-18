@@ -15,8 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com'),
   title: {
-    default: "PDF Tools — Free Online PDF Utilities",
+    default: "PDF Tools – Free Online PDF Utilities",
     template: "%s | PDF Tools",
   },
   description:

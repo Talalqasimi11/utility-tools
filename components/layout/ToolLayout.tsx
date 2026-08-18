@@ -23,8 +23,27 @@ export default function ToolLayout({
 }: ToolLayoutProps) {
   const relatedTools = currentSlug ? getRelatedTools(currentSlug) : [];
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": title,
+    "description": description,
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Any",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  };
+
   return (
     <main className="mx-auto max-w-4xl px-4 sm:px-6 py-8 sm:py-12">
+      {/* Structured Data for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Back navigation */}
       <Link
         href="/tools"

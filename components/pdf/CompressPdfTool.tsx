@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import type { UploadedFile } from "@/types/upload";
-import type { ProcessingError } from "@/types/pdf";
+import type { ProcessingError, ProcessingResult } from "@/types/pdf";
 import { getToolBySlug } from "@/config/tools";
 import { validateFiles } from "@/lib/validation/pdf";
 import { formatFileSize } from "@/lib/utils/format";
-import { compressPdf, type CompressionLevel } from "@/lib/pdf/compress";
+import { runInWorker } from "@/lib/worker/client";
+import type { CompressionLevel } from "@/lib/pdf/compress";
 import { triggerDownload } from "@/lib/utils/download";
 
 import FileDropzone from "@/components/upload/FileDropzone";
@@ -30,10 +31,10 @@ export default function CompressPdfTool() {
     reductionPercent: string;
   } | null>(null);
 
-  const handleFilesSelected = (newFiles: File[]) => {
+  const handleFilesSelected = async (newFiles: File[]) => {
     const selectedFile = newFiles[0];
 
-    const validationErr = validateFiles([selectedFile], {
+    const validationErr = await validateFiles([selectedFile], {
       maxSizeMB: 50,
       maxFiles: 1,
     });
@@ -65,7 +66,7 @@ export default function CompressPdfTool() {
     setStatus("processing");
     setError(null);
 
-    const processResult = await compressPdf(file.file);
+    const processResult = await runInWorker<ProcessingResult<Blob>>('compressPdf', { file: file.file });
 
     if (
       processResult.success && 

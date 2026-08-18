@@ -1,5 +1,5 @@
 import { PDFDocument } from 'pdf-lib';
-import JSZip from 'jszip';
+import { Zip, ZipPassThrough } from 'fflate';
 import { ErrorCode, type ProcessingResult } from '@/types/pdf';
 
 export type SplitMode = 'extract' | 'split-all' | 'split-ranges';
@@ -77,19 +77,37 @@ export async function splitPdf(file: File, options: SplitOptions): Promise<Proce
     const totalPages = sourcePdf.getPageCount();
     
     if (options.mode === 'split-all') {
-      const zip = new JSZip();
-      for (let i = 0; i < totalPages; i++) {
-        const doc = await PDFDocument.create();
-        const [copiedPage] = await doc.copyPages(sourcePdf, [i]);
-        doc.addPage(copiedPage);
-        const bytes = await doc.save();
-        
-        // Zero-padded filename, e.g. page-001.pdf
-        const pageNum = String(i + 1).padStart(String(totalPages).length, '0');
-        zip.file(`page-${pageNum}.pdf`, bytes);
-      }
-      
-      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const zipBlob = await new Promise<Blob>((resolve, reject) => {
+        const chunks: Uint8Array[] = [];
+        const zip = new Zip((err, data, final) => {
+          if (err) return reject(err);
+          chunks.push(data);
+          if (final) {
+            resolve(new Blob(chunks as BlobPart[], { type: 'application/zip' }));
+          }
+        });
+
+        (async () => {
+          try {
+            for (let i = 0; i < totalPages; i++) {
+              const doc = await PDFDocument.create();
+              const [copiedPage] = await doc.copyPages(sourcePdf, [i]);
+              doc.addPage(copiedPage);
+              const bytes = await doc.save();
+              
+              // Zero-padded filename, e.g. page-001.pdf
+              const pageNum = String(i + 1).padStart(String(totalPages).length, '0');
+              const file = new ZipPassThrough(`page-${pageNum}.pdf`);
+              zip.add(file);
+              file.push(bytes, true);
+            }
+            zip.end();
+          } catch (e) {
+            reject(e);
+          }
+        })();
+      });
+
       return {
         success: true,
         data: zipBlob,
@@ -140,18 +158,36 @@ export async function splitPdf(file: File, options: SplitOptions): Promise<Proce
     } 
     
     if (options.mode === 'split-ranges') {
-      const zip = new JSZip();
-      for (let i = 0; i < parsedGroups.length; i++) {
-        const pages = parsedGroups[i].map(p => p - 1);
-        const doc = await PDFDocument.create();
-        const copiedPages = await doc.copyPages(sourcePdf, pages);
-        copiedPages.forEach(p => doc.addPage(p));
-        
-        const bytes = await doc.save();
-        zip.file(`split-part-${i + 1}.pdf`, bytes);
-      }
-      
-      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const zipBlob = await new Promise<Blob>((resolve, reject) => {
+        const chunks: Uint8Array[] = [];
+        const zip = new Zip((err, data, final) => {
+          if (err) return reject(err);
+          chunks.push(data);
+          if (final) {
+            resolve(new Blob(chunks as BlobPart[], { type: 'application/zip' }));
+          }
+        });
+
+        (async () => {
+          try {
+            for (let i = 0; i < parsedGroups.length; i++) {
+              const pages = parsedGroups[i].map(p => p - 1);
+              const doc = await PDFDocument.create();
+              const copiedPages = await doc.copyPages(sourcePdf, pages);
+              copiedPages.forEach(p => doc.addPage(p));
+              
+              const bytes = await doc.save();
+              const file = new ZipPassThrough(`split-part-${i + 1}.pdf`);
+              zip.add(file);
+              file.push(bytes, true);
+            }
+            zip.end();
+          } catch (e) {
+            reject(e);
+          }
+        })();
+      });
+
       return {
         success: true,
         data: zipBlob,

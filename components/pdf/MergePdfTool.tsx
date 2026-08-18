@@ -5,7 +5,7 @@ import type { UploadedFile } from "@/types/upload";
 import type { ProcessingError, ProcessingResult } from "@/types/pdf";
 import { getToolBySlug } from "@/config/tools";
 import { validateFiles } from "@/lib/validation/pdf";
-import { mergePdfs } from "@/lib/pdf/merge";
+import { runInWorker } from "@/lib/worker/client";
 
 import FileDropzone from "@/components/upload/FileDropzone";
 import FileList from "@/components/upload/FileList";
@@ -21,17 +21,18 @@ export default function MergePdfTool() {
   const [error, setError] = useState<ProcessingError | string | null>(null);
   const [result, setResult] = useState<ProcessingResult<Blob> | null>(null);
 
-  const handleFilesSelected = (newFiles: File[]) => {
+  const handleFilesSelected = async (newFiles: File[]) => {
     // Validate newly selected combined with existing files
     const allFiles = [...files.map(f => f.file), ...newFiles];
     
-    const validationError = validateFiles(allFiles, {
+    const validationError = await validateFiles(allFiles, {
       maxSizeMB: 50,
       maxFiles: 20,
       minFiles: 1, // Let them upload one at a time if they want
+      maxTotalSizeMB: 100, // Enforce 100MB aggregate limit
     });
 
-    if (validationError && allFiles.length > 20) {
+    if (validationError) {
       setError(validationError);
       setStatus("error");
       return;
@@ -64,10 +65,11 @@ export default function MergePdfTool() {
   const handleProcess = async () => {
     const filesToProcess = files.map(f => f.file);
     
-    const validationError = validateFiles(filesToProcess, {
+    const validationError = await validateFiles(filesToProcess, {
       minFiles: 2,
       maxFiles: 20,
       maxSizeMB: 50,
+      maxTotalSizeMB: 100, // Enforce 100MB aggregate limit
     });
 
     if (validationError) {
@@ -79,7 +81,7 @@ export default function MergePdfTool() {
     setStatus("processing");
     setError(null);
 
-    const processResult = await mergePdfs(filesToProcess);
+    const processResult = await runInWorker<ProcessingResult<Blob>>('mergePdfs', { files: filesToProcess });
 
     if (processResult.success && processResult.data) {
       setResult(processResult);

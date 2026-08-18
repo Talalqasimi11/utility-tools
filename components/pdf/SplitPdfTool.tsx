@@ -6,7 +6,8 @@ import type { UploadedFile } from "@/types/upload";
 import type { ProcessingError } from "@/types/pdf";
 import { getToolBySlug } from "@/config/tools";
 import { validateFiles } from "@/lib/validation/pdf";
-import { splitPdf, parseRanges, type SplitMode } from "@/lib/pdf/split";
+import { runInWorker } from "@/lib/worker/client";
+import { parseRanges, type SplitMode } from "@/lib/pdf/split";
 
 import FileDropzone from "@/components/upload/FileDropzone";
 import ProcessingIndicator from "@/components/ui/ProcessingIndicator";
@@ -28,7 +29,7 @@ export default function SplitPdfTool() {
   const handleFilesSelected = async (newFiles: File[]) => {
     const selectedFile = newFiles[0];
 
-    const validationErr = validateFiles([selectedFile], {
+    const validationErr = await validateFiles([selectedFile], {
       maxSizeMB: 50,
       maxFiles: 1,
     });
@@ -91,10 +92,7 @@ export default function SplitPdfTool() {
     setStatus("processing");
     setError(null);
 
-    const processResult = await splitPdf(file.file, {
-      mode,
-      rangesStr: ranges,
-    });
+    const processResult = await runInWorker<ProcessingResult<Blob>>('splitPdf', { file: file.file, options: { mode, rangesStr: ranges } });
 
     if (processResult.success && processResult.data) {
       setResult(processResult);

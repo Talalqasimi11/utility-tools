@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import type { UploadedFile } from "@/types/upload";
-import type { ProcessingError } from "@/types/pdf";
+import type { ProcessingError, ProcessingResult } from "@/types/pdf";
 import { getToolBySlug } from "@/config/tools";
 import { validateFiles } from "@/lib/validation/pdf";
-import { imagesToPdf, type PageSizeOption, type OrientationOption } from "@/lib/pdf/images-to-pdf";
+import { runInWorker } from "@/lib/worker/client";
+import type { PageSizeOption, OrientationOption } from "@/lib/pdf/images-to-pdf";
 
 import FileDropzone from "@/components/upload/FileDropzone";
 import FileList from "@/components/upload/FileList";
@@ -25,17 +26,18 @@ export default function JpgToPdfTool() {
   
   const [result, setResult] = useState<{ data?: Blob; metadata?: { fileCount?: number } } | null>(null);
 
-  const handleFilesSelected = (newFiles: File[]) => {
+  const handleFilesSelected = async (newFiles: File[]) => {
     const allFiles = [...files.map(f => f.file), ...newFiles];
 
-    const validationErr = validateFiles(allFiles, {
+    const validationErr = await validateFiles(allFiles, {
       maxSizeMB: 20, // Images usually shouldn't be larger than 20MB
+      maxTotalSizeMB: 100, // Enforce 100MB aggregate limit
       maxFiles: 50,
       minFiles: 1,
       allowedTypes: ["image/jpeg", "image/png"],
     });
 
-    if (validationErr && allFiles.length > 50) {
+    if (validationErr) {
       setError(validationErr);
       setStatus("error");
       return;
@@ -68,10 +70,11 @@ export default function JpgToPdfTool() {
   const handleProcess = async () => {
     const filesToProcess = files.map(f => f.file);
 
-    const validationErr = validateFiles(filesToProcess, {
+    const validationErr = await validateFiles(filesToProcess, {
       minFiles: 1,
       maxFiles: 50,
       maxSizeMB: 20,
+      maxTotalSizeMB: 100, // Enforce 100MB aggregate limit
       allowedTypes: ["image/jpeg", "image/png"],
     });
 
@@ -84,10 +87,7 @@ export default function JpgToPdfTool() {
     setStatus("processing");
     setError(null);
 
-    const processResult = await imagesToPdf(filesToProcess, {
-      pageSize,
-      orientation,
-    });
+    const processResult = await runInWorker<ProcessingResult<Blob>>('imagesToPdf', { files: filesToProcess, options: { pageSize, orientation } });
 
     if (processResult.success && processResult.data) {
       setResult(processResult);

@@ -1,4 +1,4 @@
-import JSZip from 'jszip';
+import { Zip, ZipPassThrough } from 'fflate';
 import { ErrorCode, type ProcessingResult } from '@/types/pdf';
 import { parseRanges } from '@/lib/pdf/split';
 
@@ -23,7 +23,7 @@ const getQualityValue = (quality: ImageQuality): number => {
 export async function convertPdfToJpg(file: File, options: PdfToJpgOptions): Promise<ProcessingResult<Blob>> {
   try {
     // Dynamically import pdfjs-dist to avoid SSR issues
-    // @ts-expect-error
+    // @ts-expect-error - pdfjs-dist build files lack .d.ts declarations
     const pdfjsLib = await import('pdfjs-dist/build/pdf.mjs');
     
     // Set the worker source to the unpkg CDN to avoid complex bundler configurations
@@ -124,36 +124,65 @@ export async function convertPdfToJpg(file: File, options: PdfToJpgOptions): Pro
     }
 
     // Multiple pages -> create a ZIP file
-    const zip = new JSZip();
-
-    for (const pageNum of targetPages) {
-      const page = await pdf.getPage(pageNum);
-      const viewport = page.getViewport({ scale });
-      
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      if (!ctx) throw new Error('Could not create canvas context');
-      
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
-      
-      await page.render({ canvasContext: ctx, viewport }).promise;
-      
-      const blob = await new Promise<Blob>((resolve, reject) => {
-        canvas.toBlob((b) => {
-          if (b) resolve(b);
-          else reject(new Error('Canvas toBlob failed'));
-        }, 'image/jpeg', qualityValue);
+    const zipBlob = await new Promise<Blob>((resolve, reject) => {
+      const chunks: Uint8Array[] = [];
+      const zip = new Zip((err, data, final) => {
+        if (err) return reject(err);
+        chunks.push(data);
+        if (final) {
+          resolve(new Blob(chunks as BlobPart[], { type: 'application/zip' }));
+        }
       });
 
-      const arrayBuffer = await blob.arrayBuffer();
-      
-      // Zero-pad the filename based on the max page number length
-      const paddedNum = String(pageNum).padStart(String(totalPages).length, '0');
-      zip.file(`page-${paddedNum}.jpg`, arrayBuffer);
-    }
+      (async () => {
+        try {
+          for (const pageNum of targetPages) {
+            const page = await pdf.getPage(pageNum);
+            let scale = 2.0;
+            let viewport = page.getViewport({ scale });
+            
+            // Fix Canvas memory limit (max 16.7M pixels for iOS Safari)
+            const MAX_PIXELS = 16000000; 
+            const totalPixels = viewport.width * viewport.height;
+            if (totalPixels > MAX_PIXELS) {
+              scale = Math.sqrt(MAX_PIXELS / ((viewport.width / scale) * (viewport.height / scale)));
+              viewport = page.getViewport({ scale });
+            }
+            
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            if (!ctx) throw new Error('Could not create canvas context');
+            
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            
+            await page.render({ canvasContext: ctx, viewport }).promise;
+            
+            const blob = await new Promise<Blob>((resolve, reject) => {
+              canvas.toBlob((b) => {
+                if (b) resolve(b);
+                else reject(new Error('Canvas toBlob failed'));
+              }, 'image/jpeg', qualityValue);
+            });
 
-    const zipBlob = await zip.generateAsync({ type: 'blob' });
+            const arrayBuffer = await blob.arrayBuffer();
+            const uint8Array = new Uint8Array(arrayBuffer);
+            
+            const paddedNum = String(pageNum).padStart(String(totalPages).length, '0');
+            const file = new ZipPassThrough(`page-${paddedNum}.jpg`);
+            zip.add(file);
+            file.push(uint8Array, true);
+            
+            // Release memory explicitly
+            canvas.width = 0;
+            canvas.height = 0;
+          }
+          zip.end();
+        } catch (e) {
+          reject(e);
+        }
+      })();
+    });
 
     return {
       success: true,

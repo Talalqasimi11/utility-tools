@@ -13,8 +13,8 @@ export default function ProcessingIndicator({
   progress,
 }: ProcessingIndicatorProps) {
   return (
-    <div className="flex flex-col items-center gap-4 py-8">
-      <div className="w-10 h-10 border-4 border-border border-t-primary rounded-full animate-spin" />
+    <div className="flex flex-col items-center gap-4 py-8" role="status" aria-live="polite">
+      <div className="w-10 h-10 border-4 border-border border-t-primary rounded-full animate-spin" aria-hidden="true" />
       <p className="text-sm text-muted">{message}</p>
 
       {progress !== undefined && (
