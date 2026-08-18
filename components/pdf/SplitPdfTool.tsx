@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { PDFDocument } from "pdf-lib";
 import type { UploadedFile } from "@/types/upload";
+import type { ProcessingError } from "@/types/pdf";
 import { getToolBySlug } from "@/config/tools";
 import { validateFiles } from "@/lib/validation/pdf";
 import { splitPdf, parseRanges, type SplitMode } from "@/lib/pdf/split";
@@ -18,7 +19,7 @@ export default function SplitPdfTool() {
   const [file, setFile] = useState<UploadedFile | null>(null);
   const [pageCount, setPageCount] = useState<number | null>(null);
   const [status, setStatus] = useState<"idle" | "ready" | "processing" | "done" | "error">("idle");
-  const [error, setError] = useState<string | { message: string } | null>(null);
+  const [error, setError] = useState<ProcessingError | string | null>(null);
   const [result, setResult] = useState<{ data?: Blob; metadata?: { fileCount?: number } } | null>(null);
 
   const [mode, setMode] = useState<SplitMode>("extract");
