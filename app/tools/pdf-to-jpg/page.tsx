@@ -27,8 +27,8 @@ export default function PdfToJpgPage() {
       answer: "Yes. All processing happens locally within your internet browser. Your documents are never uploaded or saved to any external servers.",
     },
     {
-      question: "How will I receive the JPG files?",
-      answer: "If you convert a single page, you will download a single .jpg file. If you convert multiple pages, we will automatically bundle them into a ZIP folder for easy downloading.",
+      question: "How will I receive the image files?",
+      answer: "If you convert a single page, you will download a single .jpg image file. If you convert multiple pages, we will automatically bundle them into a ZIP folder for easy downloading.",
     },
     {
       question: "Which quality setting should I choose?",

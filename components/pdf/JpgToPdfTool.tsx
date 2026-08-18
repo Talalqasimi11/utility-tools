@@ -140,7 +140,7 @@ export default function JpgToPdfTool() {
             maxSizeMB={20}
             maxFiles={50}
             onFilesSelected={handleFilesSelected}
-            label={files.length > 0 ? "Add more images" : "Select JPG or PNG images"}
+            label={files.length > 0 ? "Add more images" : "Select Images"}
           />
 
           <FileList

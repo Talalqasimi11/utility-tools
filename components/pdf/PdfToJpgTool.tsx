@@ -135,7 +135,7 @@ export default function PdfToJpgTool() {
   }
 
   if (status === "processing" && file) {
-    return <ProcessingIndicator message="Converting PDF to JPG... This may take a moment for large files." />;
+    return <ProcessingIndicator message="Converting PDF to Image... This may take a moment for large files." />;
   }
 
   if (status === "done" && result?.data) {
@@ -289,7 +289,7 @@ export default function PdfToJpgTool() {
               onClick={handleProcess}
               className="rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white hover:bg-primary-hover transition-colors"
             >
-              Convert to JPG
+              Convert to Image
             </button>
           </div>
         </>
