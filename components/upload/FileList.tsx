@@ -42,7 +42,7 @@ export default function FileList({
       {files.map((file, index) => (
         <div
           key={file.id}
-          className="flex items-center gap-3 px-4 py-3 hover:bg-primary-light/30 transition-colors"
+          className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 hover:bg-primary-light/30 transition-colors"
         >
           {/* File number */}
           <span className="text-xs font-mono text-muted w-6 shrink-0 text-right">

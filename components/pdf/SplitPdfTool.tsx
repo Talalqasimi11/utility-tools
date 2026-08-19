@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { PDFDocument } from "pdf-lib";
 import type { UploadedFile } from "@/types/upload";
-import type { ProcessingError } from "@/types/pdf";
+import type { ProcessingError, ProcessingResult } from "@/types/pdf";
 import { getToolBySlug } from "@/config/tools";
 import { validateFiles } from "@/lib/validation/pdf";
 import { runInWorker } from "@/lib/worker/client";
@@ -159,9 +159,9 @@ export default function SplitPdfTool() {
 
       {status !== "error" && file && (
         <>
-          <div className="bg-background border border-border p-4 rounded-lg flex items-center justify-between">
-            <div>
-              <p className="font-medium text-foreground truncate max-w-sm" title={file.name}>
+          <div className="bg-background border border-border p-4 rounded-lg flex items-center justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <p className="font-medium text-foreground truncate" title={file.name}>
                 {file.name}
               </p>
               {pageCount && (

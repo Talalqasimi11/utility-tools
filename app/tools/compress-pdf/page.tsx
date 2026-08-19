@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+﻿import { Metadata } from "next";
 import ToolLayout from "@/components/layout/ToolLayout";
 import CompressPdfTool from "@/components/pdf/CompressPdfTool";
 import { getToolBySlug } from "@/config/tools";
@@ -12,6 +12,12 @@ export function generateMetadata(): Metadata {
     title: tool.seoTitle,
     description: tool.seoDescription,
     alternates: { canonical: tool.url },
+    openGraph: {
+      title: tool.seoTitle,
+      description: tool.seoDescription,
+      url: tool.url,
+      type: "website",
+    },
   };
 }
 
@@ -22,18 +28,29 @@ export default function CompressPdfPage() {
     notFound();
   }
 
+  const howTo = [
+    {
+      step: "Upload a PDF",
+      description: "Select or drag and drop a PDF file that you want to reduce in size.",
+    },
+    {
+      step: "Select compression level",
+      description: "Choose between basic, strong, or extreme compression depending on your size and quality needs.",
+    },
+    {
+      step: "Compress and save",
+      description: "Click Compress. Once the file size is reduced, you can download the optimized document.",
+    }
+  ];
+
   const faq = [
     {
-      question: "Is my data secure?",
-      answer: "Yes. All compression happens directly in your browser. Your files are never uploaded to any server.",
+      question: "Will the quality of my PDF decrease?",
+      answer: "We optimize the internal structure of the PDF. Higher compression levels may slightly reduce image quality, but text remains perfectly sharp.",
     },
     {
-      question: "How does the compression work?",
-      answer: "Our tool removes unreferenced objects, orphaned data, and compresses the structural data of your PDF to reduce the overall file size.",
-    },
-    {
-      question: "Why did my PDF not get smaller?",
-      answer: "If a PDF is already heavily optimized or consists primarily of large images that cannot be further compressed in-browser, the file size will not decrease. We will notify you if your PDF cannot be reduced further.",
+      question: "Is there a size limit?",
+      answer: "You can compress PDFs up to 50MB directly in your browser without uploading anything.",
     }
   ];
 
@@ -43,9 +60,9 @@ export default function CompressPdfPage() {
       description={tool.description}
       currentSlug={tool.slug}
       faq={faq}
+      howTo={howTo}
     >
       <CompressPdfTool />
     </ToolLayout>
   );
 }
-

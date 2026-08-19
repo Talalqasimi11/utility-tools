@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+﻿import { Metadata } from "next";
 import ToolLayout from "@/components/layout/ToolLayout";
 import SplitPdfTool from "@/components/pdf/SplitPdfTool";
 import { getToolBySlug } from "@/config/tools";
@@ -12,6 +12,12 @@ export function generateMetadata(): Metadata {
     title: tool.seoTitle,
     description: tool.seoDescription,
     alternates: { canonical: tool.url },
+    openGraph: {
+      title: tool.seoTitle,
+      description: tool.seoDescription,
+      url: tool.url,
+      type: "website",
+    },
   };
 }
 
@@ -22,18 +28,29 @@ export default function SplitPdfPage() {
     notFound();
   }
 
+  const howTo = [
+    {
+      step: "Upload your PDF",
+      description: "Select the PDF file you want to split by clicking the upload area.",
+    },
+    {
+      step: "Choose a split mode",
+      description: "Select whether you want to extract every page individually or specify custom page ranges (like 1-3, 5).",
+    },
+    {
+      step: "Split and download",
+      description: "Click Split PDF. The tool will process your file and generate a ZIP archive containing your extracted pages.",
+    }
+  ];
+
   const faq = [
     {
-      question: "Is my data secure?",
-      answer: "Yes. All processing happens directly in your browser. Your files are never uploaded to any server.",
+      question: "Can I extract specific pages?",
+      answer: "Yes, you can enter custom ranges like '1-5, 8, 11-13' to only extract exactly what you need.",
     },
     {
-      question: "How do I split every page into a separate PDF?",
-      answer: "Select the 'Split every page' option. When you process the file, you'll receive a ZIP folder containing each page as an individual PDF.",
-    },
-    {
-      question: "Can I extract only specific pages?",
-      answer: "Yes, choose 'Extract pages' and enter the page numbers or ranges (e.g., 1-5, 8, 11-13). We will combine only those pages into a single new PDF document.",
+      question: "Are my files processed securely?",
+      answer: "Everything is processed locally in your browser. No files are ever sent to our servers.",
     }
   ];
 
@@ -43,9 +60,9 @@ export default function SplitPdfPage() {
       description={tool.description}
       currentSlug={tool.slug}
       faq={faq}
+      howTo={howTo}
     >
       <SplitPdfTool />
     </ToolLayout>
   );
 }
-

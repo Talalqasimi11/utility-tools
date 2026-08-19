@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+﻿import { Metadata } from "next";
 import ToolLayout from "@/components/layout/ToolLayout";
 import MergePdfTool from "@/components/pdf/MergePdfTool";
 import { getToolBySlug } from "@/config/tools";
@@ -12,6 +12,12 @@ export function generateMetadata(): Metadata {
     title: tool.seoTitle,
     description: tool.seoDescription,
     alternates: { canonical: tool.url },
+    openGraph: {
+      title: tool.seoTitle,
+      description: tool.seoDescription,
+      url: tool.url,
+      type: "website",
+    },
   };
 }
 
@@ -21,6 +27,21 @@ export default function MergePdfPage() {
   if (!tool) {
     notFound();
   }
+
+  const howTo = [
+    {
+      step: "Select your PDF files",
+      description: "Click the upload area or drag and drop multiple PDF files into the dropzone.",
+    },
+    {
+      step: "Arrange the order",
+      description: "Drag the files or use the up and down arrows to arrange them in the exact order you want them to appear.",
+    },
+    {
+      step: "Merge and download",
+      description: "Click the Merge button. Once processing is complete, download your newly combined PDF file.",
+    }
+  ];
 
   const faq = [
     {
@@ -43,9 +64,9 @@ export default function MergePdfPage() {
       description={tool.description}
       currentSlug={tool.slug}
       faq={faq}
+      howTo={howTo}
     >
       <MergePdfTool />
     </ToolLayout>
   );
 }
-

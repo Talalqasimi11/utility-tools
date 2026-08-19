@@ -179,9 +179,9 @@ export default function PdfToJpgTool() {
 
       {status !== "error" && file && (
         <>
-          <div className="bg-background border border-border p-4 rounded-lg flex items-center justify-between">
-            <div>
-              <p className="font-medium text-foreground truncate max-w-sm" title={file.name}>
+          <div className="bg-background border border-border p-4 rounded-lg flex items-center justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <p className="font-medium text-foreground truncate" title={file.name}>
                 {file.name}
               </p>
               <p className="text-sm text-muted">

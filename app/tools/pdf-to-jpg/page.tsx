@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+﻿import { Metadata } from "next";
 import ToolLayout from "@/components/layout/ToolLayout";
 import PdfToJpgTool from "@/components/pdf/PdfToJpgTool";
 import { getToolBySlug } from "@/config/tools";
@@ -12,6 +12,12 @@ export function generateMetadata(): Metadata {
     title: tool.seoTitle,
     description: tool.seoDescription,
     alternates: { canonical: tool.url },
+    openGraph: {
+      title: tool.seoTitle,
+      description: tool.seoDescription,
+      url: tool.url,
+      type: "website",
+    },
   };
 }
 
@@ -22,18 +28,29 @@ export default function PdfToJpgPage() {
     notFound();
   }
 
+  const howTo = [
+    {
+      step: "Upload your PDF",
+      description: "Select the PDF document you want to convert into images.",
+    },
+    {
+      step: "Select conversion options",
+      description: "Choose whether to extract all pages or specific ranges. You can also adjust the image quality and scale.",
+    },
+    {
+      step: "Convert and download",
+      description: "Click Convert. The tool will process the pages and provide a ZIP file containing your high-quality JPG images.",
+    }
+  ];
+
   const faq = [
     {
-      question: "Is my data secure?",
-      answer: "Yes. All processing happens locally within your internet browser. Your documents are never uploaded or saved to any external servers.",
+      question: "Will the extracted images be high quality?",
+      answer: "Yes, you can select the scale multiplier (up to 2x) to ensure the extracted JPGs are crisp and high resolution.",
     },
     {
-      question: "How will I receive the image files?",
-      answer: "If you convert a single page, you will download a single .jpg image file. If you convert multiple pages, we will automatically bundle them into a ZIP folder for easy downloading.",
-    },
-    {
-      question: "Which quality setting should I choose?",
-      answer: "Medium is recommended for general use, balancing file size and visual clarity. Choose High if you are converting documents with small text or complex diagrams, and Low if you need the smallest possible file sizes for web uploading.",
+      question: "Is this tool safe to use with sensitive documents?",
+      answer: "Yes, because all processing happens on your device using WebAssembly. Your PDF is never uploaded to any server.",
     }
   ];
 
@@ -43,9 +60,9 @@ export default function PdfToJpgPage() {
       description={tool.description}
       currentSlug={tool.slug}
       faq={faq}
+      howTo={howTo}
     >
       <PdfToJpgTool />
     </ToolLayout>
   );
 }
-

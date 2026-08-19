@@ -10,7 +10,7 @@ export default function Header() {
         >
           PDF Tools
         </Link>
-        <nav className="flex items-center gap-6">
+        <nav className="flex items-center gap-4 sm:gap-6">
           <Link
             href="/tools"
             className="text-sm font-medium text-muted hover:text-foreground transition-colors"

@@ -139,7 +139,7 @@ export default function FileDropzone({
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       className={[
-        "relative border-2 border-dashed rounded-xl p-10 sm:p-12",
+        "relative border-2 border-dashed rounded-xl p-6 sm:p-10 md:p-12",
         "flex flex-col items-center justify-center gap-4",
         "cursor-pointer transition-all duration-200",
         isDragging
