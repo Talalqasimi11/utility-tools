@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { UploadedFile } from "@/types/upload";
 import type { ProcessingError, ProcessingResult } from "@/types/pdf";
 import { getToolBySlug } from "@/config/tools";
 import { validateFiles } from "@/lib/validation/pdf";
 import { runInWorker } from "@/lib/worker/client";
+import { trackToolView, trackFileSelected, trackProcessingStarted, trackProcessingCompleted, trackProcessingFailed, trackDownloadClicked } from "@/lib/analytics";
 
 import FileDropzone from "@/components/upload/FileDropzone";
 import FileList from "@/components/upload/FileList";
@@ -14,6 +15,7 @@ import ErrorMessage from "@/components/ui/ErrorMessage";
 import DownloadButton from "@/components/download/DownloadButton";
 
 export default function MergePdfTool() {
+  useEffect(() => { trackToolView("merge-pdf"); }, []);
   const toolConfig = getToolBySlug("merge-pdf");
   
   const [files, setFiles] = useState<UploadedFile[]>([]);
@@ -33,6 +35,7 @@ export default function MergePdfTool() {
     });
 
     if (validationError) {
+      trackProcessingFailed("merge-pdf", validationError?.code || "VALIDATION_ERROR");
       setError(validationError);
       setStatus("error");
       return;
@@ -48,6 +51,7 @@ export default function MergePdfTool() {
     setFiles(prev => [...prev, ...newUploadedFiles].slice(0, 20));
     setStatus("ready");
     setError(null);
+    trackFileSelected("merge-pdf");
   };
 
   const handleRemoveFile = (id: string) => {
@@ -73,20 +77,25 @@ export default function MergePdfTool() {
     });
 
     if (validationError) {
+      trackProcessingFailed("merge-pdf", validationError?.code || "VALIDATION_ERROR");
       setError(validationError);
       setStatus("error");
       return;
     }
 
+    trackProcessingStarted("merge-pdf");
     setStatus("processing");
     setError(null);
+    const _startTime = performance.now();
 
     const processResult = await runInWorker<ProcessingResult<Blob>>('mergePdfs', { files: filesToProcess });
 
     if (processResult.success && processResult.data) {
+      trackProcessingCompleted("merge-pdf", Math.round(performance.now() - _startTime));
       setResult(processResult);
       setStatus("done");
     } else {
+      trackProcessingFailed("merge-pdf", processResult.error?.code || "UNKNOWN");
       setError(processResult.error || "An unknown error occurred.");
       setStatus("error");
     }
@@ -102,6 +111,7 @@ export default function MergePdfTool() {
   const handleRetry = () => {
     setStatus("ready");
     setError(null);
+    trackFileSelected("merge-pdf");
   };
 
   if (status === "processing") {
@@ -111,6 +121,7 @@ export default function MergePdfTool() {
   if (status === "done" && result?.data) {
     return (
       <DownloadButton
+        onDownload={() => trackDownloadClicked("merge-pdf")}
         blob={result.data}
         filename="merged_document.pdf"
         onReset={handleReset}

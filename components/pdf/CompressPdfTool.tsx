@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { UploadedFile } from "@/types/upload";
 import type { ProcessingError, ProcessingResult } from "@/types/pdf";
 import { getToolBySlug } from "@/config/tools";
 import { validateFiles } from "@/lib/validation/pdf";
 import { formatFileSize } from "@/lib/utils/format";
 import { runInWorker } from "@/lib/worker/client";
+import { trackToolView, trackFileSelected, trackProcessingStarted, trackProcessingCompleted, trackProcessingFailed, trackDownloadClicked } from "@/lib/analytics";
 import type { CompressionLevel } from "@/lib/pdf/compress";
 import { triggerDownload } from "@/lib/utils/download";
 
@@ -15,6 +16,7 @@ import ProcessingIndicator from "@/components/ui/ProcessingIndicator";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 
 export default function CompressPdfTool() {
+  useEffect(() => { trackToolView("compress-pdf"); }, []);
   const toolConfig = getToolBySlug("compress-pdf");
 
   const [file, setFile] = useState<UploadedFile | null>(null);
@@ -40,6 +42,7 @@ export default function CompressPdfTool() {
     });
 
     if (validationErr) {
+      trackProcessingFailed("compress-pdf", validationErr?.code || "VALIDATION_ERROR");
       setError(validationErr);
       setStatus("error");
       return;
@@ -53,6 +56,7 @@ export default function CompressPdfTool() {
     });
     setStatus("ready");
     setError(null);
+    trackFileSelected("compress-pdf");
   };
 
   const handleRemoveFile = () => {
@@ -63,8 +67,10 @@ export default function CompressPdfTool() {
   const handleProcess = async () => {
     if (!file) return;
 
+    trackProcessingStarted("compress-pdf");
     setStatus("processing");
     setError(null);
+    const _startTime = performance.now();
 
     const processResult = await runInWorker<ProcessingResult<Blob>>('compressPdf', { file: file.file });
 
@@ -87,6 +93,7 @@ export default function CompressPdfTool() {
       const savedBytes = originalSize - outputSize;
       const reductionPercent = ((savedBytes / originalSize) * 100).toFixed(1);
 
+      trackProcessingCompleted("compress-pdf", Math.round(performance.now() - _startTime));
       setResult({
         blob: processResult.data,
         originalSize,
@@ -96,12 +103,14 @@ export default function CompressPdfTool() {
       });
       setStatus("done");
     } else {
+      trackProcessingFailed("compress-pdf", processResult.error?.code || "UNKNOWN");
       setError(processResult.error || "An unknown error occurred.");
       setStatus("error");
     }
   };
 
   const handleDownload = () => {
+    trackDownloadClicked("compress-pdf");
     if (result && file) {
       // Add '-compressed' before the extension
       const filename = file.name.replace(/\.pdf$/i, "-compressed.pdf");

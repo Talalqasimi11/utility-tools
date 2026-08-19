@@ -7,6 +7,7 @@ interface DownloadButtonProps {
   blob: Blob | null;
   filename: string;
   onReset?: () => void;
+  onDownload?: () => void;
   /** Number of files in the output (shows "X files created" when > 1). */
   fileCount?: number;
 }
@@ -20,12 +21,14 @@ export default function DownloadButton({
   blob,
   filename,
   onReset,
+  onDownload,
   fileCount = 1,
 }: DownloadButtonProps) {
   const handleDownload = useCallback(() => {
     if (!blob) return;
+    if (onDownload) onDownload();
     triggerDownload(blob, filename);
-  }, [blob, filename]);
+  }, [blob, filename, onDownload]);
 
   if (!blob) return null;
 

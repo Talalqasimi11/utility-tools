@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { UploadedFile } from "@/types/upload";
 import type { ProcessingError, ProcessingResult } from "@/types/pdf";
 import { getToolBySlug } from "@/config/tools";
 import { validateFiles } from "@/lib/validation/pdf";
 import { runInWorker } from "@/lib/worker/client";
+import { trackToolView, trackFileSelected, trackProcessingStarted, trackProcessingCompleted, trackProcessingFailed, trackDownloadClicked } from "@/lib/analytics";
 import type { PageSizeOption, OrientationOption } from "@/lib/pdf/images-to-pdf";
 
 import FileDropzone from "@/components/upload/FileDropzone";
@@ -15,6 +16,7 @@ import ErrorMessage from "@/components/ui/ErrorMessage";
 import DownloadButton from "@/components/download/DownloadButton";
 
 export default function JpgToPdfTool() {
+  useEffect(() => { trackToolView("jpg-to-pdf"); }, []);
   const toolConfig = getToolBySlug("jpg-to-pdf");
 
   const [files, setFiles] = useState<UploadedFile[]>([]);
@@ -38,6 +40,7 @@ export default function JpgToPdfTool() {
     });
 
     if (validationErr) {
+      trackProcessingFailed("jpg-to-pdf", validationErr?.code || "VALIDATION_ERROR");
       setError(validationErr);
       setStatus("error");
       return;
@@ -53,6 +56,7 @@ export default function JpgToPdfTool() {
     setFiles(prev => [...prev, ...newUploadedFiles].slice(0, 50));
     setStatus("ready");
     setError(null);
+    trackFileSelected("jpg-to-pdf");
   };
 
   const handleRemoveFile = (id: string) => {
@@ -79,20 +83,25 @@ export default function JpgToPdfTool() {
     });
 
     if (validationErr) {
+      trackProcessingFailed("jpg-to-pdf", validationErr?.code || "VALIDATION_ERROR");
       setError(validationErr);
       setStatus("error");
       return;
     }
 
+    trackProcessingStarted("jpg-to-pdf");
     setStatus("processing");
     setError(null);
+    const _startTime = performance.now();
 
     const processResult = await runInWorker<ProcessingResult<Blob>>('imagesToPdf', { files: filesToProcess, options: { pageSize, orientation } });
 
     if (processResult.success && processResult.data) {
+      trackProcessingCompleted("jpg-to-pdf", Math.round(performance.now() - _startTime));
       setResult(processResult);
       setStatus("done");
     } else {
+      trackProcessingFailed("jpg-to-pdf", processResult.error?.code || "UNKNOWN");
       setError(processResult.error || "An unknown error occurred.");
       setStatus("error");
     }
@@ -118,6 +127,7 @@ export default function JpgToPdfTool() {
   if (status === "done" && result?.data) {
     return (
       <DownloadButton
+        onDownload={() => trackDownloadClicked("jpg-to-pdf")}
         blob={result.data}
         filename="images.pdf"
         onReset={handleReset}

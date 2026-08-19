@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { UploadedFile } from "@/types/upload";
 import type { ProcessingError } from "@/types/pdf";
 import { getToolBySlug } from "@/config/tools";
+import { trackToolView, trackFileSelected, trackProcessingStarted, trackProcessingCompleted, trackProcessingFailed, trackDownloadClicked } from "@/lib/analytics";
 import { validateFiles } from "@/lib/validation/pdf";
 import { formatFileSize } from "@/lib/utils/format";
 import { convertPdfToJpg, type ImageQuality } from "@/lib/pdf/pdf-to-jpg";
@@ -15,6 +16,7 @@ import ErrorMessage from "@/components/ui/ErrorMessage";
 import DownloadButton from "@/components/download/DownloadButton";
 
 export default function PdfToJpgTool() {
+  useEffect(() => { trackToolView("pdf-to-jpg"); }, []);
   const toolConfig = getToolBySlug("pdf-to-jpg");
 
   const [file, setFile] = useState<UploadedFile | null>(null);
@@ -37,6 +39,7 @@ export default function PdfToJpgTool() {
     });
 
     if (validationErr) {
+      trackProcessingFailed("pdf-to-jpg", validationErr?.code || "VALIDATION_ERROR");
       setError(validationErr);
       setStatus("error");
       return;
@@ -65,7 +68,7 @@ export default function PdfToJpgTool() {
       setPageCount(null);
       setStatus("ready");
     }
-    
+    trackFileSelected("pdf-to-jpg");
     setError(null);
   };
 
@@ -95,8 +98,10 @@ export default function PdfToJpgTool() {
       }
     }
 
+    trackProcessingStarted("pdf-to-jpg");
     setStatus("processing");
     setError(null);
+    const _startTime = performance.now();
 
     const processResult = await convertPdfToJpg(file.file, {
       mode,
@@ -105,9 +110,11 @@ export default function PdfToJpgTool() {
     });
 
     if (processResult.success && processResult.data) {
+      trackProcessingCompleted("pdf-to-jpg", Math.round(performance.now() - _startTime));
       setResult(processResult);
       setStatus("done");
     } else {
+      trackProcessingFailed("pdf-to-jpg", processResult.error?.code || "UNKNOWN");
       setError(processResult.error || "An unknown error occurred.");
       setStatus("error");
     }
@@ -152,6 +159,7 @@ export default function PdfToJpgTool() {
 
     return (
       <DownloadButton
+        onDownload={() => trackDownloadClicked("pdf-to-jpg")}
         blob={result.data}
         filename={filename}
         onReset={handleReset}

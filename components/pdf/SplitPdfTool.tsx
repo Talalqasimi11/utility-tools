@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PDFDocument } from "pdf-lib";
 import type { UploadedFile } from "@/types/upload";
 import type { ProcessingError, ProcessingResult } from "@/types/pdf";
 import { getToolBySlug } from "@/config/tools";
 import { validateFiles } from "@/lib/validation/pdf";
 import { runInWorker } from "@/lib/worker/client";
+import { trackToolView, trackFileSelected, trackProcessingStarted, trackProcessingCompleted, trackProcessingFailed, trackDownloadClicked } from "@/lib/analytics";
 import { parseRanges, type SplitMode } from "@/lib/pdf/split";
 
 import FileDropzone from "@/components/upload/FileDropzone";
@@ -15,6 +16,7 @@ import ErrorMessage from "@/components/ui/ErrorMessage";
 import DownloadButton from "@/components/download/DownloadButton";
 
 export default function SplitPdfTool() {
+  useEffect(() => { trackToolView("split-pdf"); }, []);
   const toolConfig = getToolBySlug("split-pdf");
 
   const [file, setFile] = useState<UploadedFile | null>(null);
@@ -35,6 +37,7 @@ export default function SplitPdfTool() {
     });
 
     if (validationErr) {
+      trackProcessingFailed("split-pdf", validationErr?.code || "VALIDATION_ERROR");
       setError(validationErr);
       setStatus("error");
       return;
@@ -60,6 +63,7 @@ export default function SplitPdfTool() {
       setPageCount(null);
       setStatus("ready");
     }
+    trackFileSelected("split-pdf");
     setError(null);
   };
 
@@ -89,15 +93,19 @@ export default function SplitPdfTool() {
       }
     }
 
+    trackProcessingStarted("split-pdf");
     setStatus("processing");
     setError(null);
+    const _startTime = performance.now();
 
     const processResult = await runInWorker<ProcessingResult<Blob>>('splitPdf', { file: file.file, options: { mode, rangesStr: ranges } });
 
     if (processResult.success && processResult.data) {
+      trackProcessingCompleted("split-pdf", Math.round(performance.now() - _startTime));
       setResult(processResult);
       setStatus("done");
     } else {
+      trackProcessingFailed("split-pdf", processResult.error?.code || "UNKNOWN");
       setError(processResult.error || "An unknown error occurred.");
       setStatus("error");
     }
@@ -132,6 +140,7 @@ export default function SplitPdfTool() {
     const filename = isZip ? "split-pages.zip" : "extracted-pages.pdf";
     return (
       <DownloadButton
+        onDownload={() => trackDownloadClicked("split-pdf")}
         blob={result.data}
         filename={filename}
         onReset={handleReset}
