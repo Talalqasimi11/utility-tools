@@ -27,9 +27,9 @@ function GoogleAnalyticsInner({ gaId }: { gaId: string }) {
         dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${gaId}', {
+            window.gtag = function gtag(){ window.dataLayer.push(arguments); };
+            window.gtag('js', new Date());
+            window.gtag('config', '${gaId}', {
               page_path: window.location.pathname,
             });
           `,
