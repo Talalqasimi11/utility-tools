@@ -5,16 +5,16 @@ import { getToolBySlug } from "@/config/tools";
 import { notFound } from "next/navigation";
 
 export function generateMetadata(): Metadata {
-  const tool = getToolBySlug("jpg-to-pdf");
+  const tool = getToolBySlug("undefined");
   if (!tool) return {};
   
   return {
-    title: "Convert JPG to PDF Locally - Fast Image Converter",
-    description: "Transform your JPG, PNG, and images into a single PDF document. Drag and drop reordering, zero uploads, and complete privacy.",
+    title: tool.seoTitle,
+    description: tool.seoDescription,
     alternates: { canonical: tool.url },
     openGraph: {
-      title: "Convert JPG to PDF Locally - Fast Image Converter",
-      description: "Transform your JPG, PNG, and images into a single PDF document. Drag and drop reordering, zero uploads, and complete privacy.",
+      title: tool.seoTitle,
+      description: tool.seoDescription,
       url: tool.url,
       type: "website",
     },

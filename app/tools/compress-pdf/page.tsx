@@ -5,16 +5,16 @@ import { getToolBySlug } from "@/config/tools";
 import { notFound } from "next/navigation";
 
 export function generateMetadata(): Metadata {
-  const tool = getToolBySlug("compress-pdf");
+  const tool = getToolBySlug("undefined");
   if (!tool) return {};
   
   return {
-    title: "Compress PDF Files Locally - Reduce File Size",
-    description: "Reduce the file size of your PDF documents instantly in your browser. Maintain quality while meeting email attachment limits securely.",
+    title: tool.seoTitle,
+    description: tool.seoDescription,
     alternates: { canonical: tool.url },
     openGraph: {
-      title: "Compress PDF Files Locally - Reduce File Size",
-      description: "Reduce the file size of your PDF documents instantly in your browser. Maintain quality while meeting email attachment limits securely.",
+      title: tool.seoTitle,
+      description: tool.seoDescription,
       url: tool.url,
       type: "website",
     },

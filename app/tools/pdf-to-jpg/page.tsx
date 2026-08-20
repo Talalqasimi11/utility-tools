@@ -5,16 +5,16 @@ import { getToolBySlug } from "@/config/tools";
 import { notFound } from "next/navigation";
 
 export function generateMetadata(): Metadata {
-  const tool = getToolBySlug("pdf-to-jpg");
+  const tool = getToolBySlug("undefined");
   if (!tool) return {};
   
   return {
-    title: "Convert PDF to JPG Locally - Extract High Quality Images",
-    description: "Extract images from PDF documents or convert full pages to JPG formats in your browser. Fast, secure, and requires no uploads.",
+    title: tool.seoTitle,
+    description: tool.seoDescription,
     alternates: { canonical: tool.url },
     openGraph: {
-      title: "Convert PDF to JPG Locally - Extract High Quality Images",
-      description: "Extract images from PDF documents or convert full pages to JPG formats in your browser. Fast, secure, and requires no uploads.",
+      title: tool.seoTitle,
+      description: tool.seoDescription,
       url: tool.url,
       type: "website",
     },

@@ -2,6 +2,8 @@ import { mergePdfs } from '../pdf/merge';
 import { splitPdf } from '../pdf/split';
 import { compressPdf } from '../pdf/compress';
 import { imagesToPdf } from '../pdf/images-to-pdf';
+import { rotatePdf } from '../pdf/rotate';
+import { watermarkPdf } from '../pdf/watermark';
 
 self.onmessage = async (e: MessageEvent) => {
   const { id, action, args } = e.data;
@@ -20,6 +22,12 @@ self.onmessage = async (e: MessageEvent) => {
         break;
       case 'imagesToPdf':
         result = await imagesToPdf(args.files, args.options);
+        break;
+      case 'rotatePdf':
+        result = await rotatePdf(args.file, args.options);
+        break;
+      case 'watermarkPdf':
+        result = await watermarkPdf(args.file, args.options);
         break;
       default:
         throw new Error('Unknown action: ' + action);

@@ -5,16 +5,16 @@ import { getToolBySlug } from "@/config/tools";
 import { notFound } from "next/navigation";
 
 export function generateMetadata(): Metadata {
-  const tool = getToolBySlug("merge-pdf");
+  const tool = getToolBySlug("undefined");
   if (!tool) return {};
   
   return {
-    title: "Merge PDF Files Locally - Fast, Secure & Free",
-    description: "Combine multiple PDF files into one document entirely in your browser. No uploads, fast processing, and completely secure.",
+    title: tool.seoTitle,
+    description: tool.seoDescription,
     alternates: { canonical: tool.url },
     openGraph: {
-      title: "Merge PDF Files Locally - Fast, Secure & Free",
-      description: "Combine multiple PDF files into one document entirely in your browser. No uploads, fast processing, and completely secure.",
+      title: tool.seoTitle,
+      description: tool.seoDescription,
       url: tool.url,
       type: "website",
     },

@@ -5,16 +5,16 @@ import { getToolBySlug } from "@/config/tools";
 import { notFound } from "next/navigation";
 
 export function generateMetadata(): Metadata {
-  const tool = getToolBySlug("split-pdf");
+  const tool = getToolBySlug("undefined");
   if (!tool) return {};
   
   return {
-    title: "Split PDF Pages Locally - Extract Pages Securely",
-    description: "Separate a PDF into multiple files or extract specific pages entirely in your browser. Zero uploads and maximum privacy.",
+    title: tool.seoTitle,
+    description: tool.seoDescription,
     alternates: { canonical: tool.url },
     openGraph: {
-      title: "Split PDF Pages Locally - Extract Pages Securely",
-      description: "Separate a PDF into multiple files or extract specific pages entirely in your browser. Zero uploads and maximum privacy.",
+      title: tool.seoTitle,
+      description: tool.seoDescription,
       url: tool.url,
       type: "website",
     },
