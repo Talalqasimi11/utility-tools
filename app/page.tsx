@@ -1,6 +1,13 @@
+﻿import { Metadata } from "next";
 import Link from "next/link";
 import { tools } from "@/config/tools";
 import ToolIcon from "@/components/ui/ToolIcon";
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: '/',
+  }
+};
 
 export default function HomePage() {
   return (
