@@ -9,12 +9,12 @@ export function generateMetadata(): Metadata {
   if (!tool) return {};
   
   return {
-    title: tool.seoTitle,
-    description: tool.seoDescription,
+    title: "Compress PDF Files Locally - Reduce File Size",
+    description: "Reduce the file size of your PDF documents instantly in your browser. Maintain quality while meeting email attachment limits securely.",
     alternates: { canonical: tool.url },
     openGraph: {
-      title: tool.seoTitle,
-      description: tool.seoDescription,
+      title: "Compress PDF Files Locally - Reduce File Size",
+      description: "Reduce the file size of your PDF documents instantly in your browser. Maintain quality while meeting email attachment limits securely.",
       url: tool.url,
       type: "website",
     },
@@ -28,29 +28,66 @@ export default function CompressPdfPage() {
     notFound();
   }
 
+  const seoIntro = "Make your PDF files easier to share, email, and store. Our local PDF compressor optimizes your documents by removing unnecessary data and flattening structures, all without compromising your privacy or sending your files to an external server.";
+
+  const features = [
+    {
+      title: "Optimized File Size",
+      description: "Significantly reduce the storage footprint of your PDFs to bypass strict email attachment limits."
+    },
+    {
+      title: "Immediate Results",
+      description: "View the exact size reduction percentage immediately after processing completes."
+    },
+    {
+      title: "No Server Uploads",
+      description: "All compression algorithms run entirely within your web browser. Your private documents stay private."
+    },
+    {
+      title: "Automated Optimization",
+      description: "Our tool automatically selects the best compression strategies for your specific document structure."
+    }
+  ];
+
   const howTo = [
     {
-      step: "Upload a PDF",
-      description: "Select or drag and drop a PDF file that you want to reduce in size.",
+      step: "Select a PDF",
+      description: "Drag and drop the heavy PDF file you wish to compress into the designated area.",
     },
     {
-      step: "Select compression level",
-      description: "Choose between basic, strong, or extreme compression depending on your size and quality needs.",
+      step: "Start compression",
+      description: "Click the compress button to initiate the local optimization process.",
     },
     {
-      step: "Compress and save",
-      description: "Click Compress. Once the file size is reduced, you can download the optimized document.",
+      step: "Review the savings",
+      description: "Once finished, review how many megabytes were saved and the total percentage reduction.",
+    },
+    {
+      step: "Download the file",
+      description: "Save the optimized, smaller PDF document back to your device.",
     }
   ];
 
   const faq = [
     {
-      question: "Will the quality of my PDF decrease?",
-      answer: "We optimize the internal structure of the PDF. Higher compression levels may slightly reduce image quality, but text remains perfectly sharp.",
+      question: "Are my files uploaded to the internet for compression?",
+      answer: "No. The entire compression process takes place locally on your machine via your web browser. We never upload your documents.",
     },
     {
-      question: "Is there a size limit?",
-      answer: "You can compress PDFs up to 50MB directly in your browser without uploading anything.",
+      question: "How does the tool reduce the PDF file size?",
+      answer: "The tool optimizes the document's internal structure, removes unused objects, and restructures data streams without altering the visible content.",
+    },
+    {
+      question: "Will the text in my PDF become blurry?",
+      answer: "No, our compression focuses on optimizing the document's internal structure rather than aggressively downscaling text. Your documents will remain legible.",
+    },
+    {
+      question: "Why did my file size not decrease significantly?",
+      answer: "If a PDF is already heavily optimized or contains content that cannot be further compressed, the reduction percentage may be small.",
+    },
+    {
+      question: "Is there a limit on the file size I can compress?",
+      answer: "You can compress files up to the memory limit of your browser. For the best stability, we recommend compressing files under 50MB.",
     }
   ];
 
@@ -61,6 +98,8 @@ export default function CompressPdfPage() {
       currentSlug={tool.slug}
       faq={faq}
       howTo={howTo}
+      features={features}
+      seoIntro={seoIntro}
     >
       <CompressPdfTool />
     </ToolLayout>

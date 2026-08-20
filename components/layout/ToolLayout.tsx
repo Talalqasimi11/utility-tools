@@ -8,6 +8,8 @@ interface ToolLayoutProps {
   currentSlug?: string;
   faq?: { question: string; answer: string }[];
   howTo?: { step: string; description: string }[];
+  features?: { title: string; description: string }[];
+  seoIntro?: string;
 }
 
 export default function ToolLayout({
@@ -17,6 +19,8 @@ export default function ToolLayout({
   currentSlug,
   faq,
   howTo,
+  features,
+  seoIntro,
 }: ToolLayoutProps) {
   const relatedTools = currentSlug ? getRelatedTools(currentSlug) : [];
 
@@ -35,6 +39,29 @@ export default function ToolLayout({
           "price": "0",
           "priceCurrency": "USD"
         }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://pdf-toolboxx.vercel.app/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Tools",
+            "item": "https://pdf-toolboxx.vercel.app/tools"
+          },
+          ...(currentSlug ? [{
+            "@type": "ListItem",
+            "position": 3,
+            "name": title,
+            "item": `https://pdf-toolboxx.vercel.app/tools/${currentSlug}`
+          }] : [])
+        ]
       }
     ]
   };
@@ -88,6 +115,30 @@ export default function ToolLayout({
 
       <div className="mt-8">{children}</div>
 
+      {seoIntro && (
+        <section className="mt-12">
+          <p className="text-base text-muted leading-relaxed">
+            {seoIntro}
+          </p>
+        </section>
+      )}
+
+      {features && features.length > 0 && (
+        <section className="mt-16">
+          <h2 className="text-xl font-semibold text-foreground mb-6">
+            Features
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {features.map((feature, i) => (
+              <div key={i} className="bg-background border border-border p-5 rounded-xl">
+                <h3 className="font-medium text-foreground">{feature.title}</h3>
+                <p className="text-sm text-muted mt-2">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {howTo && howTo.length > 0 && (
         <section className="mt-16">
           <h2 className="text-xl font-semibold text-foreground mb-6">
@@ -109,6 +160,22 @@ export default function ToolLayout({
         </section>
       )}
 
+      <section className="mt-16 bg-background border border-border rounded-xl p-6 sm:p-8">
+        <h2 className="text-xl font-semibold text-foreground mb-4">
+          Local & Private Processing
+        </h2>
+        <div className="space-y-4 text-sm text-muted">
+          <p>
+            Your privacy is our priority. PDF Toolboxx processes all files entirely locally within your web browser. 
+          </p>
+          <ul className="list-disc pl-5 space-y-2">
+            <li><strong>No uploads:</strong> Files are never uploaded to our servers.</li>
+            <li><strong>No tracking of contents:</strong> Document contents, text, and filenames are never sent to Google Analytics.</li>
+            <li><strong>Immediate deletion:</strong> Because processing happens in browser memory, your data disappears the moment you close the tab.</li>
+          </ul>
+        </div>
+      </section>
+
       {faq && faq.length > 0 && (
         <section className="mt-16">
           <h2 className="text-xl font-semibold text-foreground mb-6">
@@ -117,10 +184,10 @@ export default function ToolLayout({
           <dl className="space-y-6">
             {faq.map((item, i) => (
               <div key={i}>
-                <dt className="text-sm font-medium text-foreground">
+                <dt className="text-base font-medium text-foreground">
                   {item.question}
                 </dt>
-                <dd className="text-sm text-muted mt-1">{item.answer}</dd>
+                <dd className="text-sm text-muted mt-1 leading-relaxed">{item.answer}</dd>
               </div>
             ))}
           </dl>
@@ -128,16 +195,16 @@ export default function ToolLayout({
       )}
 
       {relatedTools.length > 0 && (
-        <section className="mt-16">
+        <section className="mt-16 pt-16 border-t border-border">
           <h2 className="text-xl font-semibold text-foreground mb-6">
-            Related Tools
+            Related PDF Tools
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {relatedTools.map((tool) => (
               <Link
                 key={tool.slug}
                 href={tool.url}
-                className="border border-border rounded-lg p-4 hover:border-primary/50 hover:bg-primary-light/50 transition-colors"
+                className="block border border-border rounded-lg p-4 hover:border-primary/50 hover:bg-primary-light/50 transition-colors"
               >
                 <h3 className="text-sm font-medium text-foreground">
                   {tool.name}
