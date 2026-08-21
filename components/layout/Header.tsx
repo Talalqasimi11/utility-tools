@@ -15,7 +15,7 @@ export default function Header() {
             href="/tools"
             className="text-sm font-medium text-muted hover:text-foreground transition-colors"
           >
-            All Tools
+            Tools
           </Link>
         </nav>
       </div>

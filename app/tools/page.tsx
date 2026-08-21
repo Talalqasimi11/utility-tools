@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { tools } from "@/config/tools";
+import { tools, TOOL_CLUSTERS } from "@/config/tools";
 import ToolIcon from "@/components/ui/ToolIcon";
 
 export const metadata: Metadata = {
@@ -18,9 +18,9 @@ export const metadata: Metadata = {
 };
 
 export default function ToolsPage() {
-  const pdfEditingTools = tools.filter(t => ['merge-pdf', 'split-pdf', 'compress-pdf', 'remove-pages', 'extract-pages', 'rotate-pdf', 'reorder-pdf', 'watermark-pdf'].includes(t.slug));
-  const convertPdfTools = tools.filter(t => ['pdf-to-word', 'pdf-to-excel', 'pdf-to-powerpoint', 'pdf-to-jpg'].includes(t.slug));
-  const convertToPdfTools = tools.filter(t => ['word-to-pdf', 'excel-to-pdf', 'jpg-to-pdf'].includes(t.slug));
+  const pdfEditingTools = tools.filter(t => TOOL_CLUSTERS.editing.includes(t.slug));
+  const convertPdfTools = tools.filter(t => TOOL_CLUSTERS.conversion.includes(t.slug));
+  const convertToPdfTools = tools.filter(t => TOOL_CLUSTERS.reverseConversion.includes(t.slug));
 
   const renderGrid = (toolList: typeof tools) => (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

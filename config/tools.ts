@@ -187,26 +187,25 @@ export function getToolBySlug(slug: string): ToolDefinition | undefined {
   return tools.find((t) => t.slug === slug);
 }
 
-export function getRelatedTools(currentSlug: string, limit = 3): ToolDefinition[] {
-  // Define clusters for highly relevant internal linking
-  const clusters = {
-    editing: [
-      'merge-pdf', 'split-pdf', 'compress-pdf', 'remove-pages', 
-      'extract-pages', 'rotate-pdf', 'reorder-pdf', 'watermark-pdf'
-    ],
-    conversion: [
-      'pdf-to-word', 'pdf-to-excel', 'pdf-to-powerpoint', 'pdf-to-jpg'
-    ],
-    reverseConversion: [
-      'word-to-pdf', 'excel-to-pdf', 'jpg-to-pdf'
-    ]
-  };
+export const TOOL_CLUSTERS = {
+  editing: [
+    'merge-pdf', 'split-pdf', 'compress-pdf', 'remove-pages', 
+    'extract-pages', 'rotate-pdf', 'reorder-pdf', 'watermark-pdf'
+  ],
+  conversion: [
+    'pdf-to-word', 'pdf-to-excel', 'pdf-to-powerpoint', 'pdf-to-jpg'
+  ],
+  reverseConversion: [
+    'word-to-pdf', 'excel-to-pdf', 'jpg-to-pdf'
+  ]
+};
 
+export function getRelatedTools(currentSlug: string, limit = 3): ToolDefinition[] {
   // Find which cluster the current tool belongs to
   let targetCluster: string[] = [];
-  if (clusters.editing.includes(currentSlug)) targetCluster = clusters.editing;
-  else if (clusters.conversion.includes(currentSlug)) targetCluster = clusters.conversion;
-  else if (clusters.reverseConversion.includes(currentSlug)) targetCluster = clusters.reverseConversion;
+  if (TOOL_CLUSTERS.editing.includes(currentSlug)) targetCluster = TOOL_CLUSTERS.editing;
+  else if (TOOL_CLUSTERS.conversion.includes(currentSlug)) targetCluster = TOOL_CLUSTERS.conversion;
+  else if (TOOL_CLUSTERS.reverseConversion.includes(currentSlug)) targetCluster = TOOL_CLUSTERS.reverseConversion;
   
   // If no specific cluster match, just use all tools as a fallback
   if (targetCluster.length === 0) {
@@ -219,9 +218,9 @@ export function getRelatedTools(currentSlug: string, limit = 3): ToolDefinition[
   // If we don't have enough, pull from other highly related clusters to fill out the limit
   if (related.length < limit) {
     let fallbackCluster: string[] = [];
-    if (clusters.conversion.includes(currentSlug)) fallbackCluster = clusters.reverseConversion;
-    else if (clusters.reverseConversion.includes(currentSlug)) fallbackCluster = clusters.conversion;
-    else fallbackCluster = clusters.conversion; // Default fallback for editing
+    if (TOOL_CLUSTERS.conversion.includes(currentSlug)) fallbackCluster = TOOL_CLUSTERS.reverseConversion;
+    else if (TOOL_CLUSTERS.reverseConversion.includes(currentSlug)) fallbackCluster = TOOL_CLUSTERS.conversion;
+    else fallbackCluster = TOOL_CLUSTERS.conversion; // Default fallback for editing
 
     const additional = tools.filter(t => 
       fallbackCluster.includes(t.slug) && 

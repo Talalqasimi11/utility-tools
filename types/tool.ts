@@ -3,6 +3,7 @@ export interface ToolDefinition {
   name: string;
   description: string;
   category: "pdf";
+  cluster?: "editing" | "conversion" | "reverseConversion";
   url: string;
   seoTitle: string;
   seoDescription: string;
