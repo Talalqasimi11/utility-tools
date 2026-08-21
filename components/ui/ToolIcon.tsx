@@ -23,6 +23,16 @@ const TOOL_COLORS: Record<string, string> = {
     "bg-fuchsia-100 text-fuchsia-600 dark:bg-fuchsia-950 dark:text-fuchsia-400",
   "watermark-pdf":
     "bg-amber-100 text-amber-600 dark:bg-amber-950 dark:text-amber-400",
+  "pdf-to-word":
+    "bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400",
+  "word-to-pdf":
+    "bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400",
+  "pdf-to-excel":
+    "bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400",
+  "excel-to-pdf":
+    "bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400",
+  "pdf-to-powerpoint":
+    "bg-orange-100 text-orange-600 dark:bg-orange-950 dark:text-orange-400",
 };
 
 function IconPaths({ slug }: { slug: string }) {
@@ -111,6 +121,49 @@ function IconPaths({ slug }: { slug: string }) {
         <>
           <rect x="5.5" y="3" width="13" height="18" rx="2" {...common} />
           <path {...common} d="M12 9l1.5 3 3 .5-2 2 .5 3-3-1.5-3 1.5.5-3-2-2 3-.5z" fill="currentColor" fillOpacity="0.2" />
+        </>
+      );
+    case "pdf-to-word":
+      // Document with W symbol
+      return (
+        <>
+          <rect x="5.5" y="3" width="13" height="18" rx="2" {...common} />
+          <path {...common} d="M9 9l1.5 6L12 11l1.5 4L15 9" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+        </>
+      );
+    case "word-to-pdf":
+      // Document with W converting to standard doc
+      return (
+        <>
+          <rect x="5.5" y="3" width="13" height="18" rx="2" {...common} />
+          <path {...common} d="M9 9l1.5 6L12 11l1.5 4L15 9" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+          <path {...common} d="M12 17l2 2 4-4" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+        </>
+      );
+    case "pdf-to-excel":
+      // Spreadsheet grid
+      return (
+        <>
+          <rect x="4" y="4" width="16" height="16" rx="2" {...common} />
+          <path {...common} d="M4 10h16M10 4v16" strokeWidth={1.5} />
+        </>
+      );
+    case "excel-to-pdf":
+      // Spreadsheet grid converting to PDF
+      return (
+        <>
+          <rect x="4" y="4" width="16" height="16" rx="2" {...common} />
+          <path {...common} d="M4 10h16M10 4v16" strokeWidth={1.5} />
+          <path {...common} d="M12 16l2 2 4-4" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+        </>
+      );
+    case "pdf-to-powerpoint":
+      // Presentation slide representation
+      return (
+        <>
+          <rect x="3" y="4" width="18" height="12" rx="2" {...common} />
+          <path {...common} d="M8 21h8M12 16v5" strokeWidth={1.5} />
+          <path {...common} d="M7 8h10M7 12h6" strokeWidth={1.5} strokeLinecap="round" />
         </>
       );
     default:

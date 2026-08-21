@@ -4,24 +4,24 @@ import { tools } from "@/config/tools";
 import ToolIcon from "@/components/ui/ToolIcon";
 
 export const metadata: Metadata = {
-  title: "Free Online PDF Tools | PDF Toolboxx",
-  description: "Free online PDF tools to merge, split, compress, and convert PDF files. All processing happens locally in your browser for total privacy.",
+  title: "Free Online PDF Tools & Converters | PDF Toolboxx",
+  description: "Free online PDF tools and converters to merge, split, compress, and edit PDF files. All processing happens locally in your browser for total privacy.",
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: "Free Online PDF Tools | PDF Toolboxx",
-    description: "Free online PDF tools to merge, split, compress, and convert PDF files. All processing happens locally in your browser for total privacy.",
+    title: "Free Online PDF Tools & Converters | PDF Toolboxx",
+    description: "Free online PDF tools and converters to merge, split, compress, and edit PDF files. All processing happens locally in your browser for total privacy.",
     url: "/",
     type: "website",
   }
 };
 
 export default function HomePage() {
-  const popularTools = tools.filter(t => ['merge-pdf', 'compress-pdf', 'pdf-to-jpg'].includes(t.slug));
-  const organizationTools = tools.filter(t => ['merge-pdf', 'split-pdf', 'remove-pages', 'extract-pages', 'rotate-pdf', 'reorder-pdf'].includes(t.slug));
-  const conversionTools = tools.filter(t => ['jpg-to-pdf', 'pdf-to-jpg'].includes(t.slug));
-  const otherTools = tools.filter(t => ['watermark-pdf', 'compress-pdf'].includes(t.slug));
+  const popularTools = tools.filter(t => ['merge-pdf', 'pdf-to-word', 'compress-pdf', 'pdf-to-excel'].includes(t.slug));
+  const pdfEditingTools = tools.filter(t => ['merge-pdf', 'split-pdf', 'compress-pdf', 'remove-pages', 'extract-pages', 'rotate-pdf', 'reorder-pdf', 'watermark-pdf'].includes(t.slug));
+  const convertPdfTools = tools.filter(t => ['pdf-to-word', 'pdf-to-excel', 'pdf-to-powerpoint', 'pdf-to-jpg'].includes(t.slug));
+  const convertToPdfTools = tools.filter(t => ['word-to-pdf', 'excel-to-pdf', 'jpg-to-pdf'].includes(t.slug));
 
   const renderGrid = (toolList: typeof tools) => (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -45,7 +45,7 @@ export default function HomePage() {
     <main>
       <section className="mx-auto max-w-6xl px-4 sm:px-6 pt-16 pb-12 sm:pt-24 sm:pb-16 text-center">
         <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight mb-6">
-          Free Online PDF Tools
+          Free Online PDF Tools & Converters
         </h1>
         <p className="text-lg text-muted max-w-2xl mx-auto leading-relaxed">
           Welcome to PDF Toolboxx. We offer a comprehensive suite of completely free, 
@@ -61,29 +61,29 @@ export default function HomePage() {
 
       <section className="bg-muted/10 border-y border-border">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-16">
-          <h2 className="text-2xl font-bold text-foreground mb-2">PDF Organization</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-2">PDF Editing</h2>
           <p className="text-muted mb-8 max-w-3xl">
             Everything you need to arrange and organize your PDF files. Combine multiple documents into one, extract the exact pages you need, remove unwanted content, and correct the orientation of your pages.
           </p>
-          {renderGrid(organizationTools)}
+          {renderGrid(pdfEditingTools)}
         </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-4 sm:px-6 py-16">
-        <h2 className="text-2xl font-bold text-foreground mb-2">PDF Conversion</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-2">Convert from PDF</h2>
         <p className="text-muted mb-8 max-w-3xl">
-          Quickly convert your documents to and from PDF format without losing quality. Turn image formats like JPG into standardized PDF documents instantly.
+          Securely convert your PDF documents into editable Word files, Excel spreadsheets, PowerPoint presentations, or extract them directly into standard JPG images.
         </p>
-        {renderGrid(conversionTools)}
+        {renderGrid(convertPdfTools)}
       </section>
 
       <section className="bg-muted/10 border-y border-border">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-16">
-          <h2 className="text-2xl font-bold text-foreground mb-2">Other PDF Tools</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Convert to PDF</h2>
           <p className="text-muted mb-8 max-w-3xl">
-            Optimize your files for email by reducing their file size, or securely stamp your documents with custom text watermarks to protect your intellectual property.
+            Turn your standard Microsoft Office documents and personal image files into reliable, standardized PDF documents quickly and securely.
           </p>
-          {renderGrid(otherTools)}
+          {renderGrid(convertToPdfTools)}
         </div>
       </section>
 

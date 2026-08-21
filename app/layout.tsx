@@ -16,13 +16,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com'),
-  title: {
-    default: "PDF Tools - Free Online PDF Utilities",
-    template: "%s | PDF Tools",
-  },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://pdf-toolboxx.vercel.app'),
+  title: "Free Online PDF Tools & Converters | PDF Toolboxx",
   description:
-    "Free online PDF tools. Merge, split, compress, and convert PDF files directly in your browser.",
+    "Free online PDF tools. Merge, split, compress, and convert PDF files directly in your browser with 100% data privacy.",
+  openGraph: {
+    title: "Free Online PDF Tools & Converters | PDF Toolboxx",
+    description: "Free online PDF tools. Merge, split, compress, and convert PDF files directly in your browser with 100% data privacy.",
+    url: "/",
+    siteName: "PDF Toolboxx",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Free Online PDF Tools & Converters | PDF Toolboxx",
+    description: "Free online PDF tools. Merge, split, compress, and convert PDF files directly in your browser with 100% data privacy.",
+  }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

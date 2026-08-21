@@ -9,12 +9,17 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@xmldom/xmldom": "^0.9.11",
+    "docx": "^9.7.1",
     "fflate": "^0.8.3",
+    "mammoth": "^1.12.1",
     "next": "16.3.1",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^6.2.108",
+    "pptxgenjs": "^4.0.1",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
